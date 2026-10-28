@@ -1,0 +1,1657 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- ScreenGui Utama
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DarkModernUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 1. TOMBOL TOGGLE BULAT (40x40 Avatar)
+local ToggleButton = Instance.new("ImageButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 30, 0, 30)
+ToggleButton.Position = UDim2.new(0, 20, 0.5, -20)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+ToggleButton.Parent = ScreenGui
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleButton
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(60, 60, 75)
+ToggleStroke.Thickness = 2
+ToggleStroke.Parent = ToggleButton
+
+task.spawn(function()
+	local userId = LocalPlayer.UserId
+	local thumbType = Enum.ThumbnailType.HeadShot
+	local thumbSize = Enum.ThumbnailSize.Size150x150
+	local content, _ = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+	ToggleButton.Image = content
+end)
+
+-- 2. MAIN FRAME (MENU UTAMA)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 520, 0, 360)
+MainFrame.Position = UDim2.new(0.5, -260, 0.5, -180)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(45, 45, 55)
+MainStroke.Thickness = 1
+MainStroke.Parent = MainFrame
+
+-- Topbar
+local Topbar = Instance.new("Frame")
+Topbar.Name = "Topbar"
+Topbar.Size = UDim2.new(1, 0, 0, 40)
+Topbar.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
+Topbar.BorderSizePixel = 0
+Topbar.Parent = MainFrame
+
+local TopbarCorner = Instance.new("UICorner")
+TopbarCorner.CornerRadius = UDim.new(0, 10)
+TopbarCorner.Parent = Topbar
+
+local TitleText = Instance.new("TextLabel")
+TitleText.Size = UDim2.new(1, -50, 1, 0)
+TitleText.Position = UDim2.new(0, 15, 0, 0)
+TitleText.BackgroundTransparency = 1
+TitleText.Text = "UNIVERSAL MENU"
+TitleText.TextColor3 = Color3.fromRGB(240, 240, 245)
+TitleText.TextSize = 14
+TitleText.Font = Enum.Font.GothamBold
+TitleText.TextXAlignment = Enum.TextXAlignment.Left
+TitleText.Parent = Topbar
+
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -35, 0, 5)
+MinimizeBtn.BackgroundTransparency = 1
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+MinimizeBtn.TextSize = 20
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.Parent = Topbar
+
+-- 3. SIDEBAR NAVIGATION
+local Sidebar = Instance.new("Frame")
+Sidebar.Name = "Sidebar"
+Sidebar.Size = UDim2.new(0, 130, 1, -40)
+Sidebar.Position = UDim2.new(0, 0, 0, 40)
+Sidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = MainFrame
+
+local TabContainer = Instance.new("Frame")
+TabContainer.Size = UDim2.new(1, 0, 1, -80)
+TabContainer.BackgroundTransparency = 1
+TabContainer.Parent = Sidebar
+
+local TabListLayout = Instance.new("UIListLayout")
+TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TabListLayout.Padding = UDim.new(0, 5)
+TabListLayout.Parent = TabContainer
+
+local TabPadding = Instance.new("UIPadding")
+TabPadding.PaddingTop = UDim.new(0, 10)
+TabPadding.PaddingLeft = UDim.new(0, 10)
+TabPadding.PaddingRight = UDim.new(0, 10)
+TabPadding.Parent = TabContainer
+
+local ShutdownBtn = Instance.new("TextButton")
+ShutdownBtn.Name = "ShutdownButton"
+ShutdownBtn.Size = UDim2.new(1, -20, 0, 32)
+ShutdownBtn.Position = UDim2.new(0, 10, 1, -75)
+ShutdownBtn.BackgroundColor3 = Color3.fromRGB(45, 20, 25)
+ShutdownBtn.BorderSizePixel = 0
+ShutdownBtn.Text = "Shutdown"
+ShutdownBtn.TextColor3 = Color3.fromRGB(255, 80, 90)
+ShutdownBtn.TextSize = 12
+ShutdownBtn.Font = Enum.Font.GothamMedium
+ShutdownBtn.Parent = Sidebar
+
+local ShutdownCorner = Instance.new("UICorner")
+ShutdownCorner.CornerRadius = UDim.new(0, 6)
+ShutdownCorner.Parent = ShutdownBtn
+
+local FooterText = Instance.new("TextLabel")
+FooterText.Size = UDim2.new(1, 0, 0, 35)
+FooterText.Position = UDim2.new(0, 0, 1, -35)
+FooterText.BackgroundTransparency = 1
+FooterText.Text = "HanzTwo Script"
+FooterText.TextColor3 = Color3.fromRGB(90, 90, 105)
+FooterText.TextSize = 10
+FooterText.Font = Enum.Font.Gotham
+FooterText.Parent = Sidebar
+
+-- 4. CONTAINER KONTEN TAB
+local ContentContainer = Instance.new("Frame")
+ContentContainer.Name = "ContentContainer"
+ContentContainer.Size = UDim2.new(1, -145, 1, -50)
+ContentContainer.Position = UDim2.new(0, 138, 0, 45)
+ContentContainer.BackgroundTransparency = 1
+ContentContainer.Parent = MainFrame
+
+local tabs = {"Player", "Teleport", "ESP", "Spect", "Misc"}
+local tabFrames = {}
+local tabButtons = {}
+
+local function createTabButton(name, order)
+	local btn = Instance.new("TextButton")
+	btn.Name = name .. "Tab"
+	btn.Size = UDim2.new(1, 0, 0, 28)
+	btn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+	btn.BackgroundTransparency = 1
+	btn.BorderSizePixel = 0
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(140, 140, 155)
+	btn.TextSize = 11
+	btn.Font = Enum.Font.GothamMedium
+	btn.LayoutOrder = order
+	btn.Parent = TabContainer
+
+	local btnCorner = Instance.new("UICorner")
+	btnCorner.CornerRadius = UDim.new(0, 6)
+	btnCorner.Parent = btn
+
+	local frame = Instance.new("ScrollingFrame")
+	frame.Name = name .. "Frame"
+	frame.Size = UDim2.new(1, -5, 1, -5)
+	frame.BackgroundTransparency = 1
+	frame.BorderSizePixel = 0
+	frame.Visible = false
+	frame.ScrollBarThickness = 3
+	frame.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 75)
+	frame.CanvasSize = UDim2.new(0, 0, 0, 0)
+	frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	frame.Parent = ContentContainer
+
+	local layout = Instance.new("UIListLayout")
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+	layout.Padding = UDim.new(0, 8)
+	layout.Parent = frame
+
+	local padding = Instance.new("UIPadding")
+	padding.PaddingRight = UDim.new(0, 8)
+	padding.Parent = frame
+
+	tabFrames[name] = frame
+	tabButtons[name] = btn
+
+	btn.MouseButton1Click:Connect(function()
+		for _, f in pairs(tabFrames) do f.Visible = false end
+		for _, b in pairs(tabButtons) do
+			TweenService:Create(b, TweenInfo.new(0.2), {
+				BackgroundTransparency = 1,
+				TextColor3 = Color3.fromRGB(140, 140, 155)
+			}):Play()
+		end
+
+		frame.Visible = true
+		TweenService:Create(btn, TweenInfo.new(0.2), {
+			BackgroundTransparency = 0,
+			TextColor3 = Color3.fromRGB(255, 255, 255)
+		}):Play()
+	end)
+end
+
+for i, tabName in ipairs(tabs) do
+	createTabButton(tabName, i)
+end
+
+if tabFrames["Player"] then
+	tabFrames["Player"].Visible = true
+	tabButtons["Player"].BackgroundTransparency = 0
+	tabButtons["Player"].TextColor3 = Color3.fromRGB(255, 255, 255)
+end
+
+-- POPUP MODAL
+local ModalOverlay = Instance.new("Frame")
+ModalOverlay.Name = "ModalOverlay"
+ModalOverlay.Size = UDim2.new(1, 0, 1, 0)
+ModalOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ModalOverlay.BackgroundTransparency = 0.5
+ModalOverlay.Visible = false
+ModalOverlay.ZIndex = 10
+ModalOverlay.Parent = MainFrame
+
+local ModalBox = Instance.new("Frame")
+ModalBox.Size = UDim2.new(0, 260, 0, 140)
+ModalBox.Position = UDim2.new(0.5, -130, 0.5, -70)
+ModalBox.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+ModalBox.BorderSizePixel = 0
+ModalBox.ZIndex = 11
+ModalBox.Parent = ModalOverlay
+
+local ModalCorner = Instance.new("UICorner")
+ModalCorner.CornerRadius = UDim.new(0, 8)
+ModalCorner.Parent = ModalBox
+
+local ModalTitle = Instance.new("TextLabel")
+ModalTitle.Size = UDim2.new(1, 0, 0, 30)
+ModalTitle.Position = UDim2.new(0, 0, 0, 10)
+ModalTitle.BackgroundTransparency = 1
+ModalTitle.Text = "Nama Save Point"
+ModalTitle.TextColor3 = Color3.fromRGB(240, 240, 245)
+ModalTitle.TextSize = 13
+ModalTitle.Font = Enum.Font.GothamBold
+ModalTitle.ZIndex = 11
+ModalTitle.Parent = ModalBox
+
+local ModalInput = Instance.new("TextBox")
+ModalInput.Size = UDim2.new(1, -40, 0, 32)
+ModalInput.Position = UDim2.new(0, 20, 0, 45)
+ModalInput.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+ModalInput.BorderSizePixel = 0
+ModalInput.Text = ""
+ModalInput.PlaceholderText = "Masukkan nama..."
+ModalInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+ModalInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
+ModalInput.TextSize = 12
+ModalInput.Font = Enum.Font.Gotham
+ModalInput.ZIndex = 11
+ModalInput.Parent = ModalBox
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 6)
+InputCorner.Parent = ModalInput
+
+local SaveModalBtn = Instance.new("TextButton")
+SaveModalBtn.Size = UDim2.new(0, 100, 0, 30)
+SaveModalBtn.Position = UDim2.new(0, 20, 1, -40)
+SaveModalBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 220)
+SaveModalBtn.BorderSizePixel = 0
+SaveModalBtn.Text = "Save"
+SaveModalBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SaveModalBtn.TextSize = 12
+SaveModalBtn.Font = Enum.Font.GothamBold
+SaveModalBtn.ZIndex = 11
+SaveModalBtn.Parent = ModalBox
+
+local SaveCorner = Instance.new("UICorner")
+SaveCorner.CornerRadius = UDim.new(0, 6)
+SaveCorner.Parent = SaveModalBtn
+
+local CancelModalBtn = Instance.new("TextButton")
+CancelModalBtn.Size = UDim2.new(0, 100, 0, 30)
+CancelModalBtn.Position = UDim2.new(1, -120, 1, -40)
+CancelModalBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+CancelModalBtn.BorderSizePixel = 0
+CancelModalBtn.Text = "Cancel"
+CancelModalBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
+CancelModalBtn.TextSize = 12
+CancelModalBtn.Font = Enum.Font.GothamMedium
+CancelModalBtn.ZIndex = 11
+CancelModalBtn.Parent = ModalBox
+
+local CancelCorner = Instance.new("UICorner")
+CancelCorner.CornerRadius = UDim.new(0, 6)
+CancelCorner.Parent = CancelModalBtn
+
+-- HELPER COMPONENTS
+local function addToggle(parentFrame, titleText, callback)
+	local ToggleFrame = Instance.new("Frame")
+	ToggleFrame.Size = UDim2.new(1, 0, 0, 40)
+	ToggleFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+	ToggleFrame.BorderSizePixel = 0
+	ToggleFrame.Parent = parentFrame
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 6)
+	Corner.Parent = ToggleFrame
+
+	local Label = Instance.new("TextLabel")
+	Label.Size = UDim2.new(1, -60, 1, 0)
+	Label.Position = UDim2.new(0, 12, 0, 0)
+	Label.BackgroundTransparency = 1
+	Label.Text = titleText
+	Label.TextColor3 = Color3.fromRGB(220, 220, 230)
+	Label.TextSize = 12
+	Label.Font = Enum.Font.GothamMedium
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+	Label.Parent = ToggleFrame
+
+	local SwitchBtn = Instance.new("TextButton")
+	SwitchBtn.Size = UDim2.new(0, 42, 0, 22)
+	SwitchBtn.Position = UDim2.new(1, -50, 0.5, -11)
+	SwitchBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+	SwitchBtn.BorderSizePixel = 0
+	SwitchBtn.Text = ""
+	SwitchBtn.Parent = ToggleFrame
+
+	local SwitchCorner = Instance.new("UICorner")
+	SwitchCorner.CornerRadius = UDim.new(1, 0)
+	SwitchCorner.Parent = SwitchBtn
+
+	local Dot = Instance.new("Frame")
+	Dot.Size = UDim2.new(0, 16, 0, 16)
+	Dot.Position = UDim2.new(0, 3, 0.5, -8)
+	Dot.BackgroundColor3 = Color3.fromRGB(150, 150, 160)
+	Dot.BorderSizePixel = 0
+	Dot.Parent = SwitchBtn
+
+	local DotCorner = Instance.new("UICorner")
+	DotCorner.CornerRadius = UDim.new(1, 0)
+	DotCorner.Parent = Dot
+
+	local enabled = false
+	SwitchBtn.MouseButton1Click:Connect(function()
+		enabled = not enabled
+		if enabled then
+			TweenService:Create(SwitchBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 170, 255)}):Play()
+			TweenService:Create(Dot, TweenInfo.new(0.2), {Position = UDim2.new(1, -19, 0.5, -8), BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+		else
+			TweenService:Create(SwitchBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
+			TweenService:Create(Dot, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = Color3.fromRGB(150, 150, 160)}):Play()
+		end
+		task.spawn(function() callback(enabled) end)
+	end)
+end
+
+local function addButton(parentFrame, titleText, callback)
+	local BtnFrame = Instance.new("TextButton")
+	BtnFrame.Size = UDim2.new(1, 0, 0, 35)
+	BtnFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+	BtnFrame.BorderSizePixel = 0
+	BtnFrame.Text = titleText
+	BtnFrame.TextColor3 = Color3.fromRGB(220, 220, 230)
+	BtnFrame.TextSize = 12
+	BtnFrame.Font = Enum.Font.GothamMedium
+	BtnFrame.Parent = parentFrame
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 6)
+	Corner.Parent = BtnFrame
+
+	BtnFrame.MouseButton1Click:Connect(function()
+		task.spawn(callback)
+	end)
+end
+
+-- LOGIKA & STORAGE
+local connections = {}
+local defaultLighting = {
+	FogEnd = Lighting.FogEnd,
+	ClockTime = Lighting.ClockTime
+}
+local currentWalkSpeed = 16
+local isSpeedLoopEnabled = false
+local currentButtonSize = 30
+local savedWaypoints = {}
+local activeShortcuts = {}
+
+-- MANAJEMEN PENYIMPANAN FILE TELEPORT JSON
+local placeId = tostring(game.PlaceId)
+local folderName = "DarkModernUI"
+local fileName = folderName .. "/TeleportData.json"
+
+local function initStorage()
+	if isfolder and not isfolder(folderName) and makefolder then
+		makefolder(folderName)
+	end
+end
+
+local function loadAllMapData()
+	initStorage()
+	if readfile and isfile and isfile(fileName) then
+		local success, result = pcall(function()
+			return HttpService:JSONDecode(readfile(fileName))
+		end)
+		if success and type(result) == "table" then
+			return result
+		end
+	end
+	return {}
+end
+
+local function saveWaypointsToFile()
+	initStorage()
+	if writefile then
+		local allData = loadAllMapData()
+		allData[placeId] = {}
+		
+		for name, cf in pairs(savedWaypoints) do
+			allData[placeId][name] = {cf.X, cf.Y, cf.Z}
+		end
+		
+		pcall(function()
+			writefile(fileName, HttpService:JSONEncode(allData))
+		end)
+	end
+end
+
+-- TAB 1: PLAYER
+local WalkSpeedFrame = Instance.new("Frame")
+WalkSpeedFrame.Size = UDim2.new(1, 0, 0, 50)
+WalkSpeedFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+WalkSpeedFrame.BorderSizePixel = 0
+WalkSpeedFrame.Parent = tabFrames["Player"]
+
+local WSCorner = Instance.new("UICorner")
+WSCorner.CornerRadius = UDim.new(0, 6)
+WSCorner.Parent = WalkSpeedFrame
+
+local WSLabel = Instance.new("TextLabel")
+WSLabel.Size = UDim2.new(0.35, 0, 0, 22)
+WSLabel.Position = UDim2.new(0, 12, 0, 4)
+WSLabel.BackgroundTransparency = 1
+WSLabel.Text = "WalkSpeed"
+WSLabel.TextColor3 = Color3.fromRGB(220, 220, 230)
+WSLabel.TextSize = 12
+WSLabel.Font = Enum.Font.GothamMedium
+WSLabel.TextXAlignment = Enum.TextXAlignment.Left
+WSLabel.Parent = WalkSpeedFrame
+
+local WSValueLabel = Instance.new("TextLabel")
+WSValueLabel.Size = UDim2.new(0.15, 0, 0, 22)
+WSValueLabel.Position = UDim2.new(0.35, 0, 0, 4)
+WSValueLabel.BackgroundTransparency = 1
+WSValueLabel.Text = "16"
+WSValueLabel.TextColor3 = Color3.fromRGB(140, 140, 155)
+WSValueLabel.TextSize = 11
+WSValueLabel.Font = Enum.Font.Gotham
+WSValueLabel.Parent = WalkSpeedFrame
+
+local LoopBtn = Instance.new("TextButton")
+LoopBtn.Size = UDim2.new(0, 42, 0, 20)
+LoopBtn.Position = UDim2.new(1, -94, 0, 5)
+LoopBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+LoopBtn.BorderSizePixel = 0
+LoopBtn.Text = "Loop"
+LoopBtn.TextColor3 = Color3.fromRGB(150, 150, 160)
+LoopBtn.TextSize = 10
+LoopBtn.Font = Enum.Font.GothamBold
+LoopBtn.Parent = WalkSpeedFrame
+
+local LoopCorner = Instance.new("UICorner")
+LoopCorner.CornerRadius = UDim.new(0, 4)
+LoopCorner.Parent = LoopBtn
+
+local ResetWSBtn = Instance.new("TextButton")
+ResetWSBtn.Size = UDim2.new(0, 44, 0, 20)
+ResetWSBtn.Position = UDim2.new(1, -48, 0, 5)
+ResetWSBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+ResetWSBtn.BorderSizePixel = 0
+ResetWSBtn.Text = "Reset"
+ResetWSBtn.TextColor3 = Color3.fromRGB(150, 150, 160)
+ResetWSBtn.TextSize = 10
+ResetWSBtn.Font = Enum.Font.GothamBold
+ResetWSBtn.Parent = WalkSpeedFrame
+
+local ResetCorner = Instance.new("UICorner")
+ResetCorner.CornerRadius = UDim.new(0, 4)
+ResetCorner.Parent = ResetWSBtn
+
+local WSTrack = Instance.new("TextButton")
+WSTrack.Size = UDim2.new(1, -24, 0, 6)
+WSTrack.Position = UDim2.new(0, 12, 1, -14)
+WSTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+WSTrack.BorderSizePixel = 0
+WSTrack.Text = ""
+WSTrack.Parent = WalkSpeedFrame
+
+local WSTrackCorner = Instance.new("UICorner")
+WSTrackCorner.CornerRadius = UDim.new(1, 0)
+WSTrackCorner.Parent = WSTrack
+
+local WSFill = Instance.new("Frame")
+WSFill.Size = UDim2.new(0, 0, 1, 0)
+WSFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+WSFill.BorderSizePixel = 0
+WSFill.Parent = WSTrack
+
+local WSFillCorner = Instance.new("UICorner")
+WSFillCorner.CornerRadius = UDim.new(1, 0)
+WSFillCorner.Parent = WSFill
+
+local wsDragging = false
+local function updateWS(input)
+	local pos = math.clamp((input.Position.X - WSTrack.AbsolutePosition.X) / WSTrack.AbsoluteSize.X, 0, 1)
+	local val = math.floor(16 + (200 - 16) * pos)
+	WSFill.Size = UDim2.new(pos, 0, 1, 0)
+	WSValueLabel.Text = tostring(val)
+	currentWalkSpeed = val
+	if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+		LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = val
+	end
+end
+
+WSTrack.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		wsDragging = true
+		updateWS(input)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if wsDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		updateWS(input)
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		wsDragging = false
+	end
+end)
+
+LoopBtn.MouseButton1Click:Connect(function()
+	isSpeedLoopEnabled = not isSpeedLoopEnabled
+	if isSpeedLoopEnabled then
+		TweenService:Create(LoopBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 170, 255), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+	else
+		TweenService:Create(LoopBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 50), TextColor3 = Color3.fromRGB(150, 150, 160)}):Play()
+	end
+end)
+
+ResetWSBtn.MouseButton1Click:Connect(function()
+	currentWalkSpeed = 16
+	WSValueLabel.Text = "16"
+	WSFill.Size = UDim2.new(0, 0, 1, 0)
+	if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+		LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 16
+	end
+end)
+
+connections["WalkSpeedLoop"] = RunService.RenderStepped:Connect(function()
+	if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+		local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+		if isSpeedLoopEnabled then
+			if hum.WalkSpeed ~= currentWalkSpeed then hum.WalkSpeed = currentWalkSpeed end
+		end
+	end
+end)
+
+addButton(tabFrames["Player"], "Fly (Execute)", function()
+	loadstring(game:HttpGet("https://pastebin.com/raw/aH7ZY853"))()
+end)
+
+-- ESP Player
+local espObjects = {}
+local isESPEnabled = false
+local playerCharConnections = {}
+
+local function removeESP()
+	for _, obj in ipairs(espObjects) do
+		if obj.Connection then
+			pcall(function() obj.Connection:Disconnect() end)
+		end
+	end
+	espObjects = {}
+
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr.Character then
+			local oldHL = plr.Character:FindFirstChild("ESPHighlight")
+			if oldHL then oldHL:Destroy() end
+			
+			local head = plr.Character:FindFirstChild("Head")
+			if head then
+				local oldBB = head:FindFirstChild("ESPBillboard")
+				if oldBB then oldBB:Destroy() end
+			end
+		end
+	end
+end
+
+local function setupCharacterESP(plr, char)
+	if not isESPEnabled or not char or plr == LocalPlayer then return end
+
+	local oldHL = char:FindFirstChild("ESPHighlight")
+	if oldHL then oldHL:Destroy() end
+
+	local highlight = Instance.new("Highlight")
+	highlight.Name = "ESPHighlight"
+	highlight.FillColor = Color3.fromRGB(0, 170, 255)
+	highlight.FillTransparency = 0.5
+	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+	highlight.OutlineTransparency = 0
+	highlight.Adornee = char
+	highlight.Parent = char
+
+	task.spawn(function()
+		local head = char:FindFirstChild("Head") or char:WaitForChild("Head", 5)
+		if not head or not isESPEnabled or not char:IsDescendantOf(workspace) then return end
+
+		local oldBB = head:FindFirstChild("ESPBillboard")
+		if oldBB then oldBB:Destroy() end
+
+		local billboard = Instance.new("BillboardGui")
+		billboard.Name = "ESPBillboard"
+		billboard.Adornee = head
+		billboard.Size = UDim2.new(0, 200, 0, 50)
+		billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = head
+
+		local nameLabel = Instance.new("TextLabel")
+		nameLabel.Size = UDim2.new(1, 0, 1, 0)
+		nameLabel.BackgroundTransparency = 1
+		nameLabel.Text = plr.DisplayName
+		nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		nameLabel.TextStrokeTransparency = 0
+		nameLabel.TextSize = 11
+		nameLabel.Font = Enum.Font.GothamBold
+		nameLabel.Parent = billboard
+
+		local connection
+		connection = RunService.RenderStepped:Connect(function()
+			if isESPEnabled and char and char.Parent and char:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				local distance = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude)
+				nameLabel.Text = string.format("%s\n[%d Studs]", plr.DisplayName, distance)
+			else
+				if connection then connection:Disconnect() end
+			end
+		end)
+
+		table.insert(espObjects, {Connection = connection})
+	end)
+end
+
+local function trackPlayer(plr)
+	if plr == LocalPlayer then return end
+
+	if playerCharConnections[plr] then
+		playerCharConnections[plr]:Disconnect()
+		playerCharConnections[plr] = nil
+	end
+
+	playerCharConnections[plr] = plr.CharacterAdded:Connect(function(char)
+		if isESPEnabled then
+			task.wait(0.1)
+			setupCharacterESP(plr, char)
+		end
+	end)
+
+	if plr.Character then
+		setupCharacterESP(plr, plr.Character)
+	end
+end
+addToggle(tabFrames["Player"], "Infinite Jump", function(state)
+	if state then
+		connections["InfiniteJump"] = UserInputService.JumpRequest:Connect(function()
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+				LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+		end)
+	else
+		if connections["InfiniteJump"] then
+			connections["InfiniteJump"]:Disconnect()
+			connections["InfiniteJump"] = nil
+		end
+	end
+end)
+
+addToggle(tabFrames["Player"], "ESP Player", function(state)
+	isESPEnabled = state
+
+	if state then
+		for _, plr in ipairs(Players:GetPlayers()) do
+			trackPlayer(plr)
+		end
+
+		connections["ESP_PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
+			trackPlayer(plr)
+		end)
+	else
+		if connections["ESP_PlayerAdded"] then
+			connections["ESP_PlayerAdded"]:Disconnect()
+			connections["ESP_PlayerAdded"] = nil
+		end
+
+		for plr, conn in pairs(playerCharConnections) do
+			if conn then conn:Disconnect() end
+		end
+		playerCharConnections = {}
+
+		removeESP()
+	end
+end)
+
+addToggle(tabFrames["Player"], "No Fog", function(state)
+	if state then
+		connections["NoFog"] = RunService.RenderStepped:Connect(function() Lighting.FogEnd = 9e9 end)
+	else
+		if connections["NoFog"] then connections["NoFog"]:Disconnect() connections["NoFog"] = nil end
+		Lighting.FogEnd = defaultLighting.FogEnd
+	end
+end)
+
+addToggle(tabFrames["Player"], "No Clip", function(state)
+	if state then
+		connections["NoClip"] = RunService.Stepped:Connect(function()
+			if LocalPlayer.Character then
+				for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+					if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end
+				end
+			end
+		end)
+	else
+		if connections["NoClip"] then connections["NoClip"]:Disconnect() connections["NoClip"] = nil end
+	end
+end)
+
+addToggle(tabFrames["Player"], "Always Day", function(state)
+	if state then
+		connections["AlwaysDay"] = RunService.RenderStepped:Connect(function() Lighting.ClockTime = 12 end)
+	else
+		if connections["AlwaysDay"] then connections["AlwaysDay"]:Disconnect() connections["AlwaysDay"] = nil end
+		Lighting.ClockTime = defaultLighting.ClockTime
+	end
+end)
+
+-- =================================================================
+-- TAB ESP (ESP PART + CYCLE TP + TARGET TP CROSSHAIR)
+-- =================================================================
+
+-- Header Kontrol Atas (Add ESP & Target TP Controller)
+local ESPTopHeader = Instance.new("Frame")
+ESPTopHeader.Size = UDim2.new(1, 0, 0, 75)
+ESPTopHeader.BackgroundTransparency = 1
+ESPTopHeader.Parent = tabFrames["ESP"]
+
+local AddESPBtn = Instance.new("TextButton")
+AddESPBtn.Size = UDim2.new(1, 0, 0, 32)
+AddESPBtn.Position = UDim2.new(0, 0, 0, 0)
+AddESPBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+AddESPBtn.BorderSizePixel = 0
+AddESPBtn.Text = "+ Add ESP"
+AddESPBtn.TextColor3 = Color3.fromRGB(220, 220, 230)
+AddESPBtn.TextSize = 11
+AddESPBtn.Font = Enum.Font.GothamMedium
+AddESPBtn.Parent = ESPTopHeader
+
+local AddESPCorner = Instance.new("UICorner")
+AddESPCorner.CornerRadius = UDim.new(0, 6)
+AddESPCorner.Parent = AddESPBtn
+
+-- Row Sub-Header: Target TP Toggle & Size Control
+local SubHeaderFrame = Instance.new("Frame")
+SubHeaderFrame.Size = UDim2.new(1, 0, 0, 35)
+SubHeaderFrame.Position = UDim2.new(0, 0, 0, 38)
+SubHeaderFrame.BackgroundTransparency = 1
+SubHeaderFrame.Parent = ESPTopHeader
+
+local TargetTPToggleBtn = Instance.new("TextButton")
+TargetTPToggleBtn.Size = UDim2.new(0.48, 0, 1, 0)
+TargetTPToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+TargetTPToggleBtn.BorderSizePixel = 0
+TargetTPToggleBtn.Text = "Target TP: OFF"
+TargetTPToggleBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+TargetTPToggleBtn.TextSize = 10
+TargetTPToggleBtn.Font = Enum.Font.GothamMedium
+TargetTPToggleBtn.Parent = SubHeaderFrame
+
+local TargetTPCorner = Instance.new("UICorner")
+TargetTPCorner.CornerRadius = UDim.new(0, 6)
+TargetTPCorner.Parent = TargetTPToggleBtn
+
+local TargetSizeControl = Instance.new("Frame")
+TargetSizeControl.Size = UDim2.new(0.48, 0, 1, 0)
+TargetSizeControl.Position = UDim2.new(0.52, 0, 0, 0)
+TargetSizeControl.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+TargetSizeControl.BorderSizePixel = 0
+TargetSizeControl.Parent = SubHeaderFrame
+
+local TargetSizeCorner = Instance.new("UICorner")
+TargetSizeCorner.CornerRadius = UDim.new(0, 6)
+TargetSizeCorner.Parent = TargetSizeControl
+
+local targetBtnSize = 30
+local TargetSizeLabel = Instance.new("TextLabel")
+TargetSizeLabel.Size = UDim2.new(1, -50, 1, 0)
+TargetSizeLabel.Position = UDim2.new(0, 6, 0, 0)
+TargetSizeLabel.BackgroundTransparency = 1
+TargetSizeLabel.Text = "Size: " .. targetBtnSize
+TargetSizeLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
+TargetSizeLabel.TextSize = 10
+TargetSizeLabel.Font = Enum.Font.GothamMedium
+TargetSizeLabel.TextXAlignment = Enum.TextXAlignment.Left
+TargetSizeLabel.Parent = TargetSizeControl
+
+local TMinusBtn = Instance.new("TextButton")
+TMinusBtn.Size = UDim2.new(0, 20, 0, 20)
+TMinusBtn.Position = UDim2.new(1, -44, 0.5, -10)
+TMinusBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+TMinusBtn.BorderSizePixel = 0
+TMinusBtn.Text = "-"
+TMinusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TMinusBtn.TextSize = 11
+TMinusBtn.Font = Enum.Font.GothamBold
+TMinusBtn.Parent = TargetSizeControl
+
+local TMinusCorner = Instance.new("UICorner")
+TMinusCorner.CornerRadius = UDim.new(0, 4)
+TMinusCorner.Parent = TMinusBtn
+
+local TPlusBtn = Instance.new("TextButton")
+TPlusBtn.Size = UDim2.new(0, 20, 0, 20)
+TPlusBtn.Position = UDim2.new(1, -22, 0.5, -10)
+TPlusBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+TPlusBtn.BorderSizePixel = 0
+TPlusBtn.Text = "+"
+TPlusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TPlusBtn.TextSize = 11
+TPlusBtn.Font = Enum.Font.GothamBold
+TPlusBtn.Parent = TargetSizeControl
+
+local TPlusCorner = Instance.new("UICorner")
+TPlusCorner.CornerRadius = UDim.new(0, 4)
+TPlusCorner.Parent = TPlusBtn
+
+-- UI LIST CONTAINER
+local ESPListFrame = Instance.new("Frame")
+ESPListFrame.Name = "ESPList"
+ESPListFrame.Size = UDim2.new(1, 0, 0, 0)
+ESPListFrame.Position = UDim2.new(0, 0, 0, 80)
+ESPListFrame.BackgroundTransparency = 1
+ESPListFrame.AutomaticSize = Enum.AutomaticSize.Y
+ESPListFrame.Parent = tabFrames["ESP"]
+
+local ESPLayout = Instance.new("UIListLayout")
+ESPLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ESPLayout.Padding = UDim.new(0, 6)
+ESPLayout.Parent = ESPListFrame
+
+-- SYSTEM CROSSHAIR & FLOATING TARGET BUTTON
+local CrosshairFrame = Instance.new("Frame")
+CrosshairFrame.Name = "ESPCrosshair"
+CrosshairFrame.Size = UDim2.new(0, 16, 0, 16)
+CrosshairFrame.Position = UDim2.new(0.5, -8, 0.5, -8)
+CrosshairFrame.BackgroundTransparency = 1
+CrosshairFrame.Visible = false
+CrosshairFrame.Parent = ScreenGui
+
+local CHLineH = Instance.new("Frame")
+CHLineH.Size = UDim2.new(1, 0, 0, 2)
+CHLineH.Position = UDim2.new(0, 0, 0.5, -1)
+CHLineH.BackgroundColor3 = Color3.fromRGB(0, 255, 170)
+CHLineH.BorderSizePixel = 0
+CHLineH.Parent = CrosshairFrame
+
+local CHLineV = Instance.new("Frame")
+CHLineV.Size = UDim2.new(0, 2, 1, 0)
+CHLineV.Position = UDim2.new(0.5, -1, 0, 0)
+CHLineV.BackgroundColor3 = Color3.fromRGB(0, 255, 170)
+CHLineV.BorderSizePixel = 0
+CHLineV.Parent = CrosshairFrame
+
+local FloatingTPBtn = Instance.new("TextButton")
+FloatingTPBtn.Name = "FloatingTargetTP"
+FloatingTPBtn.Size = UDim2.new(0, targetBtnSize, 0, targetBtnSize)
+FloatingTPBtn.Position = UDim2.new(0.5, 20, 0.5, 20)
+FloatingTPBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+FloatingTPBtn.BorderSizePixel = 0
+FloatingTPBtn.Text = "TP"
+FloatingTPBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FloatingTPBtn.TextSize = 11
+FloatingTPBtn.Font = Enum.Font.GothamBold
+FloatingTPBtn.Visible = false
+FloatingTPBtn.Active = true
+FloatingTPBtn.Draggable = true
+FloatingTPBtn.Parent = ScreenGui
+
+local FloatingCorner = Instance.new("UICorner")
+FloatingCorner.CornerRadius = UDim.new(0, 6)
+FloatingCorner.Parent = FloatingTPBtn
+
+local FloatingStroke = Instance.new("UIStroke")
+FloatingStroke.Color = Color3.fromRGB(255, 255, 255)
+FloatingStroke.Thickness = 1
+FloatingStroke.Parent = FloatingTPBtn
+
+-- TRACKING DATA
+local globalActiveESPs = {} -- Menyimpan ref objek part
+local currentLockedTarget = nil
+
+TMinusBtn.MouseButton1Click:Connect(function()
+	if targetBtnSize > 15 then
+		targetBtnSize = targetBtnSize - 5
+		TargetSizeLabel.Text = "Size: " .. targetBtnSize
+		FloatingTPBtn.Size = UDim2.new(0, targetBtnSize, 0, targetBtnSize)
+	end
+end)
+
+TPlusBtn.MouseButton1Click:Connect(function()
+	if targetBtnSize < 60 then
+		targetBtnSize = targetBtnSize + 5
+		TargetSizeLabel.Text = "Size: " .. targetBtnSize
+		FloatingTPBtn.Size = UDim2.new(0, targetBtnSize, 0, targetBtnSize)
+	end
+end)
+
+-- LOGIKA ITEM LIST ESP
+local function addESPPartItem(targetQuery)
+	local ItemFrame = Instance.new("Frame")
+	ItemFrame.Size = UDim2.new(1, 0, 0, 36)
+	ItemFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+	ItemFrame.BorderSizePixel = 0
+	ItemFrame.Parent = ESPListFrame
+
+	local ItemCorner = Instance.new("UICorner")
+	ItemCorner.CornerRadius = UDim.new(0, 6)
+	ItemCorner.Parent = ItemFrame
+
+local ItemName = Instance.new("TextLabel")
+	ItemName.Size = UDim2.new(1, -125, 0, 18)
+	ItemName.Position = UDim2.new(0, 10, 0, 2)
+	ItemName.BackgroundTransparency = 1
+	ItemName.Text = targetQuery
+	ItemName.TextColor3 = Color3.fromRGB(220, 220, 230)
+	ItemName.TextSize = 10
+	ItemName.Font = Enum.Font.GothamMedium
+	ItemName.TextXAlignment = Enum.TextXAlignment.Left
+	ItemName.TextTruncate = Enum.TextTruncate.AtEnd
+	ItemName.Parent = ItemFrame
+
+	-- TAMBAHAN: Teks "Target" di bawah nama item
+	local TargetLabel = Instance.new("TextLabel")
+	TargetLabel.Size = UDim2.new(1, -125, 0, 14)
+	TargetLabel.Position = UDim2.new(0, 10, 0, 18)
+	TargetLabel.BackgroundTransparency = 1
+	TargetLabel.Text = "Target"
+	TargetLabel.TextColor3 = Color3.fromRGB(0, 255, 170)
+	TargetLabel.TextSize = 9
+	TargetLabel.Font = Enum.Font.GothamBold
+	TargetLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TargetLabel.Visible = false
+	TargetLabel.Parent = ItemFrame	local CycleTPBtn = Instance.new("TextButton")
+	CycleTPBtn.Size = UDim2.new(0, 45, 0, 24)
+	CycleTPBtn.Position = UDim2.new(1, -110, 0.5, -12)
+	CycleTPBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 220)
+	CycleTPBtn.BorderSizePixel = 0
+	CycleTPBtn.Text = "TP [0]"
+	CycleTPBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CycleTPBtn.TextSize = 9
+	CycleTPBtn.Font = Enum.Font.GothamBold
+	CycleTPBtn.Parent = ItemFrame
+
+	local CycleCorner = Instance.new("UICorner")
+	CycleCorner.CornerRadius = UDim.new(0, 4)
+	CycleCorner.Parent = CycleTPBtn
+
+	local ESPToggleBtn = Instance.new("TextButton")
+	ESPToggleBtn.Size = UDim2.new(0, 32, 0, 24)
+	ESPToggleBtn.Position = UDim2.new(1, -62, 0.5, -12)
+	ESPToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+	ESPToggleBtn.BorderSizePixel = 0
+	ESPToggleBtn.Text = "ESP"
+	ESPToggleBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+	ESPToggleBtn.TextSize = 10
+	ESPToggleBtn.Font = Enum.Font.GothamBold
+	ESPToggleBtn.Parent = ItemFrame
+
+	local ESPBtnCorner = Instance.new("UICorner")
+	ESPBtnCorner.CornerRadius = UDim.new(0, 4)
+	ESPBtnCorner.Parent = ESPToggleBtn
+
+	local DelBtn = Instance.new("TextButton")
+	DelBtn.Size = UDim2.new(0, 24, 0, 24)
+	DelBtn.Position = UDim2.new(1, -28, 0.5, -12)
+	DelBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 50)
+	DelBtn.BorderSizePixel = 0
+	DelBtn.Text = "X"
+	DelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	DelBtn.TextSize = 10
+	DelBtn.Font = Enum.Font.GothamBold
+	DelBtn.Parent = ItemFrame
+
+	local DelCorner = Instance.new("UICorner")
+	DelCorner.CornerRadius = UDim.new(0, 4)
+	DelCorner.Parent = DelBtn
+
+	local isEnabled = false
+	local espObjects = {}
+	local targetPartList = {}
+	local currentCycleIndex = 0
+	local listener = nil
+
+	local function removeESP()
+		if listener then listener:Disconnect() listener = nil end
+		for target, data in pairs(espObjects) do
+			if data.Highlight then pcall(function() data.Highlight:Destroy() end) end
+			if data.Box then pcall(function() data.Box:Destroy() end) end
+			if data.Billboard then pcall(function() data.Billboard:Destroy() end) end
+			globalActiveESPs[target] = nil
+		end
+		espObjects = {}
+		targetPartList = {}
+		currentCycleIndex = 0
+		CycleTPBtn.Text = "TP [0]"
+	end
+
+	local function createESPOnPart(target)
+		if not target or espObjects[target] then return end
+		local primaryPart = target:IsA("BasePart") and target or (target:IsA("Model") and (target.PrimaryPart or target:FindFirstChildWhichIsA("BasePart", true)))
+		if not primaryPart then return end
+
+		local createdData = {}
+
+		local hl = Instance.new("Highlight")
+		hl.Name = "PartESP_Highlight"
+		hl.FillColor = Color3.fromRGB(255, 170, 0)
+		hl.FillTransparency = 0.5
+		hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+		hl.Adornee = target
+		hl.Parent = target
+		createdData.Highlight = hl
+
+		local box = Instance.new("BoxHandleAdornment")
+		box.Name = "PartESP_Box"
+		box.Size = primaryPart.Size
+		box.Color3 = Color3.fromRGB(255, 170, 0)
+		box.Transparency = 0.4
+		box.AlwaysOnTop = true
+		box.ZIndex = 10
+		box.Adornee = primaryPart
+		box.Parent = primaryPart
+		createdData.Box = box
+
+		local bb = Instance.new("BillboardGui")
+		bb.Name = "PartESP_Billboard"
+		bb.Adornee = primaryPart
+		bb.Size = UDim2.new(0, 150, 0, 30)
+		bb.StudsOffset = Vector3.new(0, 2, 0)
+		bb.AlwaysOnTop = true
+		bb.Parent = primaryPart
+
+	local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.Text = target.Name
+		label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		label.TextStrokeTransparency = 0
+		label.TextSize = 11
+		label.Font = Enum.Font.GothamBold
+		label.Parent = bb
+		createdData.Billboard = bb
+
+		espObjects[target] = createdData
+		table.insert(targetPartList, primaryPart)
+		globalActiveESPs[primaryPart] = {ItemNameLabel = ItemName, OriginalText = targetQuery}local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 0, 16)
+		label.Position = UDim2.new(0, 0, 0, 0)
+		label.BackgroundTransparency = 1
+		label.Text = target.Name
+		label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		label.TextStrokeTransparency = 0
+		label.TextSize = 11
+		label.Font = Enum.Font.GothamBold
+		label.Parent = bb
+
+		-- Teks "Target" Melayang di Atas Part
+		local targetLabel = Instance.new("TextLabel")
+		targetLabel.Size = UDim2.new(1, 0, 0, 14)
+		targetLabel.Position = UDim2.new(0, 0, 0, 16)
+		targetLabel.BackgroundTransparency = 1
+		targetLabel.Text = "[ Target ]"
+		targetLabel.TextColor3 = Color3.fromRGB(0, 255, 170)
+		targetLabel.TextStrokeTransparency = 0
+		targetLabel.TextSize = 10
+		targetLabel.Font = Enum.Font.GothamBold
+		targetLabel.Visible = false -- Sembunyi, baru muncul jika diincar Crosshair
+		targetLabel.Parent = bb
+
+		createdData.Billboard = bb
+		createdData.TargetText = targetLabel
+
+		espObjects[target] = createdData
+		table.insert(targetPartList, primaryPart)
+		
+		-- Simpan referensi teks target ke globalActiveESPs
+		globalActiveESPs[primaryPart] = {
+			TargetText = targetLabel
+		}
+
+		CycleTPBtn.Text = string.format("TP [1/%d]", #targetPartList)
+	end
+
+	local function getTargetByPath(queryString)
+		local cleanPath = queryString:gsub("^workspace[./]", ""):gsub("^game%.workspace[./]", "")
+		local current = workspace
+		for segment in string.gmatch(cleanPath, "[^./]+") do
+			if current then current = current:FindFirstChild(segment) else return nil end
+		end
+		return current
+	end
+
+	local function enableESP()
+		removeESP()
+		task.spawn(function()
+			local targetObject = getTargetByPath(targetQuery)
+			if targetObject then
+				if targetObject:IsA("BasePart") or targetObject:IsA("Model") then
+					createESPOnPart(targetObject)
+				elseif targetObject:IsA("Folder") then
+					for _, child in ipairs(targetObject:GetChildren()) do createESPOnPart(child) end
+				end
+				listener = targetObject.ChildAdded:Connect(function(child) if isEnabled then createESPOnPart(child) end end)
+			else
+				local queryLower = targetQuery:lower()
+				for _, desc in ipairs(workspace:GetDescendants()) do
+					if desc:IsA("BasePart") or desc:IsA("Model") then
+						if desc.Name:lower() == queryLower or desc.Name:lower():sub(1, #queryLower) == queryLower then
+							createESPOnPart(desc)
+						end
+					end
+				end
+				listener = workspace.DescendantAdded:Connect(function(desc)
+					if isEnabled and (desc:IsA("BasePart") or desc:IsA("Model")) then
+						if desc.Name:lower() == queryLower or desc.Name:lower():sub(1, #queryLower) == queryLower then
+							createESPOnPart(desc)
+						end
+					end
+				end)
+			end
+		end)
+	end
+
+	ESPToggleBtn.MouseButton1Click:Connect(function()
+		isEnabled = not isEnabled
+		if isEnabled then
+			ESPToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+			ESPToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			enableESP()
+		else
+			ESPToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+			ESPToggleBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+			removeESP()
+		end
+	end)
+
+	-- LOGIKA CYCLE TELEPORT (NANTI DI-KLIK REPEATABLE)
+	CycleTPBtn.MouseButton1Click:Connect(function()
+		-- Bersihkan daftar part yang sudah terhapus
+		local validList = {}
+		for _, p in ipairs(targetPartList) do
+			if p and p:IsDescendantOf(workspace) then
+				table.insert(validList, p)
+			end
+		end
+		targetPartList = validList
+
+		if #targetPartList == 0 then
+			CycleTPBtn.Text = "TP [0]"
+			return
+		end
+
+		currentCycleIndex = currentCycleIndex + 1
+		if currentCycleIndex > #targetPartList then
+			currentCycleIndex = 1
+		end
+
+		CycleTPBtn.Text = string.format("TP [%d/%d]", currentCycleIndex, #targetPartList)
+
+		local targetPart = targetPartList[currentCycleIndex]
+		if targetPart and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			LocalPlayer.Character.HumanoidRootPart.CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)
+		end
+	end)
+
+	DelBtn.MouseButton1Click:Connect(function()
+		removeESP()
+		ItemFrame:Destroy()
+	end)
+end
+
+-- SYSTEM TARGET TP & CROSSHAIR RAYCASTING
+local isTargetTPActive = false
+
+TargetTPToggleBtn.MouseButton1Click:Connect(function()
+	isTargetTPActive = not isTargetTPActive
+	if isTargetTPActive then
+		TargetTPToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+		TargetTPToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TargetTPToggleBtn.Text = "Target TP: ON"
+		CrosshairFrame.Visible = true
+		FloatingTPBtn.Visible = true
+	else
+		TargetTPToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+		TargetTPToggleBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+		TargetTPToggleBtn.Text = "Target TP: OFF"
+		CrosshairFrame.Visible = false
+		FloatingTPBtn.Visible = false
+		currentLockedTarget = nil
+	end
+end)
+
+-- UPDATE CROSSHAIR SCANNING EVERY FRAME
+connections["TargetTP_Scanner"] = RunService.RenderStepped:Connect(function()
+	if not isTargetTPActive then return end
+
+	local camera = workspace.CurrentCamera
+	if not camera then return end
+
+	-- Sembunyikan semua tulisan [ Target ] pada BillboardGui Part
+	for part, info in pairs(globalActiveESPs) do
+		if info.TargetText then
+			info.TargetText.Visible = false
+		end
+	end
+
+	local viewportCenter = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+	local unitRay = camera:ViewportPointToRay(viewportCenter.X, viewportCenter.Y)
+
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+	if LocalPlayer.Character then
+		raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+	end
+
+	local rayResult = workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000, raycastParams)
+	local hitInstance = rayResult and rayResult.Instance
+
+	local closestPart = nil
+	local shortestCharDistance = math.huge
+
+	-- 1. Deteksi Fisik Langsung via Raycast
+	if hitInstance then
+		for part, info in pairs(globalActiveESPs) do
+			if part and part:IsDescendantOf(workspace) then
+				if hitInstance == part or hitInstance:IsDescendantOf(part) or part:IsAncestorOf(hitInstance) then
+					closestPart = part
+					break
+				end
+			end
+		end
+	end
+
+	-- 2. Radius Toleransi jika Raycast Meleset Sedikit
+	if not closestPart then
+		for part, info in pairs(globalActiveESPs) do
+			if part and part:IsDescendantOf(workspace) then
+				local screenPos, onScreen = camera:WorldToViewportPoint(part.Position)
+				if onScreen then
+					local distToCenter = (Vector2.new(screenPos.X, screenPos.Y) - viewportCenter).Magnitude
+					if distToCenter <= 150 then
+						if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+							local charDist = (LocalPlayer.Character.HumanoidRootPart.Position - part.Position).Magnitude
+							if charDist < shortestCharDistance then
+								shortestCharDistance = charDist
+								closestPart = part
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	currentLockedTarget = closestPart
+
+	-- Munculkan tulisan [ Target ] di BillboardGui Part yang sedang diincar
+	if currentLockedTarget and globalActiveESPs[currentLockedTarget] then
+		local info = globalActiveESPs[currentLockedTarget]
+		if info.TargetText then
+			info.TargetText.Visible = true
+		end
+	end
+end)
+-- TAB 2: TELEPORT
+local TeleportTopHeader = Instance.new("Frame")
+TeleportTopHeader.Size = UDim2.new(1, 0, 0, 35)
+TeleportTopHeader.BackgroundTransparency = 1
+TeleportTopHeader.Parent = tabFrames["Teleport"]
+
+local SetSaveBtn = Instance.new("TextButton")
+SetSaveBtn.Size = UDim2.new(0.48, 0, 1, 0)
+SetSaveBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+SetSaveBtn.BorderSizePixel = 0
+SetSaveBtn.Text = "Set New Save Point"
+SetSaveBtn.TextColor3 = Color3.fromRGB(220, 220, 230)
+SetSaveBtn.TextSize = 11
+SetSaveBtn.Font = Enum.Font.GothamMedium
+SetSaveBtn.Parent = TeleportTopHeader
+
+local SetSaveCorner = Instance.new("UICorner")
+SetSaveCorner.CornerRadius = UDim.new(0, 6)
+SetSaveCorner.Parent = SetSaveBtn
+
+local SizeControlFrame = Instance.new("Frame")
+SizeControlFrame.Size = UDim2.new(0.48, 0, 1, 0)
+SizeControlFrame.Position = UDim2.new(0.52, 0, 0, 0)
+SizeControlFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+SizeControlFrame.BorderSizePixel = 0
+SizeControlFrame.Parent = TeleportTopHeader
+
+local SizeCorner = Instance.new("UICorner")
+SizeCorner.CornerRadius = UDim.new(0, 6)
+SizeCorner.Parent = SizeControlFrame
+
+local SizeLabel = Instance.new("TextLabel")
+SizeLabel.Size = UDim2.new(1, -54, 1, 0)
+SizeLabel.Position = UDim2.new(0, 8, 0, 0)
+SizeLabel.BackgroundTransparency = 1
+SizeLabel.Text = "Size: " .. currentButtonSize
+SizeLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
+SizeLabel.TextSize = 10
+SizeLabel.Font = Enum.Font.GothamMedium
+SizeLabel.TextXAlignment = Enum.TextXAlignment.Left
+SizeLabel.Parent = SizeControlFrame
+
+local MinusBtn = Instance.new("TextButton")
+MinusBtn.Size = UDim2.new(0, 22, 0, 22)
+MinusBtn.Position = UDim2.new(1, -48, 0.5, -11)
+MinusBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+MinusBtn.BorderSizePixel = 0
+MinusBtn.Text = "-"
+MinusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinusBtn.TextSize = 12
+MinusBtn.Font = Enum.Font.GothamBold
+MinusBtn.Parent = SizeControlFrame
+
+local MinusCorner = Instance.new("UICorner")
+MinusCorner.CornerRadius = UDim.new(0, 4)
+MinusCorner.Parent = MinusBtn
+
+local PlusBtn = Instance.new("TextButton")
+PlusBtn.Size = UDim2.new(0, 22, 0, 22)
+PlusBtn.Position = UDim2.new(1, -24, 0.5, -11)
+PlusBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+PlusBtn.BorderSizePixel = 0
+PlusBtn.Text = "+"
+PlusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlusBtn.TextSize = 12
+PlusBtn.Font = Enum.Font.GothamBold
+PlusBtn.Parent = SizeControlFrame
+
+local PlusCorner = Instance.new("UICorner")
+PlusCorner.CornerRadius = UDim.new(0, 4)
+PlusCorner.Parent = PlusBtn
+
+local function updateShortcutSizes()
+	for _, scBtn in pairs(activeShortcuts) do
+		if scBtn then
+			scBtn.Size = UDim2.new(0, currentButtonSize * 2.5, 0, currentButtonSize)
+			scBtn.TextSize = math.clamp(currentButtonSize * 0.35, 8, 16)
+		end
+	end
+end
+
+MinusBtn.MouseButton1Click:Connect(function()
+	if currentButtonSize > 10 then
+		currentButtonSize = currentButtonSize - 5
+		SizeLabel.Text = "Size: " .. currentButtonSize
+		updateShortcutSizes()
+	end
+end)
+
+PlusBtn.MouseButton1Click:Connect(function()
+	if currentButtonSize < 50 then
+		currentButtonSize = currentButtonSize + 5
+		SizeLabel.Text = "Size: " .. currentButtonSize
+		updateShortcutSizes()
+	end
+end)
+
+-- Container List Save Point
+local WaypointListFrame = Instance.new("Frame")
+WaypointListFrame.Name = "WaypointList"
+WaypointListFrame.Size = UDim2.new(1, 0, 0, 0)
+WaypointListFrame.BackgroundTransparency = 1
+WaypointListFrame.AutomaticSize = Enum.AutomaticSize.Y
+WaypointListFrame.Parent = tabFrames["Teleport"]
+
+local WaypointLayout = Instance.new("UIListLayout")
+WaypointLayout.SortOrder = Enum.SortOrder.LayoutOrder
+WaypointLayout.Padding = UDim.new(0, 6)
+WaypointLayout.Parent = WaypointListFrame
+
+local function addWaypointItem(name, cframe)
+	local ItemFrame = Instance.new("Frame")
+	ItemFrame.Size = UDim2.new(1, 0, 0, 36)
+	ItemFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+	ItemFrame.BorderSizePixel = 0
+	ItemFrame.Parent = WaypointListFrame
+
+	local ItemCorner = Instance.new("UICorner")
+	ItemCorner.CornerRadius = UDim.new(0, 6)
+	ItemCorner.Parent = ItemFrame
+
+	local ItemName = Instance.new("TextLabel")
+	ItemName.Size = UDim2.new(1, -110, 1, 0)
+	ItemName.Position = UDim2.new(0, 10, 0, 0)
+	ItemName.BackgroundTransparency = 1
+	ItemName.Text = name
+	ItemName.TextColor3 = Color3.fromRGB(220, 220, 230)
+	ItemName.TextSize = 11
+	ItemName.Font = Enum.Font.GothamMedium
+	ItemName.TextXAlignment = Enum.TextXAlignment.Left
+	ItemName.Parent = ItemFrame
+
+	local SCBtn = Instance.new("TextButton")
+	SCBtn.Size = UDim2.new(0, 28, 0, 24)
+	SCBtn.Position = UDim2.new(1, -96, 0.5, -12)
+	SCBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+	SCBtn.BorderSizePixel = 0
+	SCBtn.Text = "SC"
+	SCBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+	SCBtn.TextSize = 10
+	SCBtn.Font = Enum.Font.GothamBold
+	SCBtn.Parent = ItemFrame
+
+	local SCCorner = Instance.new("UICorner")
+	SCCorner.CornerRadius = UDim.new(0, 4)
+	SCCorner.Parent = SCBtn
+
+	local TPBtn = Instance.new("TextButton")
+	TPBtn.Size = UDim2.new(0, 28, 0, 24)
+	TPBtn.Position = UDim2.new(1, -64, 0.5, -12)
+	TPBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 220)
+	TPBtn.BorderSizePixel = 0
+	TPBtn.Text = "TP"
+	TPBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TPBtn.TextSize = 10
+	TPBtn.Font = Enum.Font.GothamBold
+	TPBtn.Parent = ItemFrame
+
+	local TPCorner = Instance.new("UICorner")
+	TPCorner.CornerRadius = UDim.new(0, 4)
+	TPCorner.Parent = TPBtn
+
+	local DelBtn = Instance.new("TextButton")
+	DelBtn.Size = UDim2.new(0, 24, 0, 24)
+	DelBtn.Position = UDim2.new(1, -32, 0.5, -12)
+	DelBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 50)
+	DelBtn.BorderSizePixel = 0
+	DelBtn.Text = "X"
+	DelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	DelBtn.TextSize = 10
+	DelBtn.Font = Enum.Font.GothamBold
+	DelBtn.Parent = ItemFrame
+
+	local DelCorner = Instance.new("UICorner")
+	DelCorner.CornerRadius = UDim.new(0, 4)
+	DelCorner.Parent = DelBtn
+
+	TPBtn.MouseButton1Click:Connect(function()
+		if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			LocalPlayer.Character.HumanoidRootPart.CFrame = cframe
+		end
+	end)
+
+	SCBtn.MouseButton1Click:Connect(function()
+		if activeShortcuts[name] then
+			activeShortcuts[name]:Destroy()
+			activeShortcuts[name] = nil
+			SCBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+		else
+			local SCWidget = Instance.new("TextButton")
+			SCWidget.Name = "SC_" .. name
+			SCWidget.Size = UDim2.new(0, currentButtonSize * 2.5, 0, currentButtonSize)
+			SCWidget.Position = UDim2.new(0.8, 0, 0.3, 0)
+			SCWidget.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+			SCWidget.BorderSizePixel = 0
+			SCWidget.Text = name
+			SCWidget.TextColor3 = Color3.fromRGB(255, 255, 255)
+			SCWidget.TextSize = math.clamp(currentButtonSize * 0.35, 8, 16)
+			SCWidget.Font = Enum.Font.GothamBold
+			SCWidget.Active = MainFrame.Visible
+			SCWidget.Draggable = MainFrame.Visible
+			SCWidget.Parent = ScreenGui
+
+			local WidgetCorner = Instance.new("UICorner")
+			WidgetCorner.CornerRadius = UDim.new(0, 6)
+			WidgetCorner.Parent = SCWidget
+
+			local WidgetStroke = Instance.new("UIStroke")
+			WidgetStroke.Color = Color3.fromRGB(0, 170, 255)
+			WidgetStroke.Thickness = 1
+			WidgetStroke.Parent = SCWidget
+
+			SCWidget.MouseButton1Click:Connect(function()
+				if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+					LocalPlayer.Character.HumanoidRootPart.CFrame = cframe
+				end
+			end)
+
+			activeShortcuts[name] = SCWidget
+			SCBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+		end
+	end)
+
+	DelBtn.MouseButton1Click:Connect(function()
+		if activeShortcuts[name] then
+			activeShortcuts[name]:Destroy()
+			activeShortcuts[name] = nil
+		end
+		savedWaypoints[name] = nil
+		ItemFrame:Destroy()
+		saveWaypointsToFile() -- Simpan perubahan setelah item dihapus
+	end)
+end
+
+-- INIALISASI LOAD DATA SAAT SCRIPT DIJALANKAN
+local allData = loadAllMapData()
+local currentMapData = allData[placeId] or {}
+
+for name, posTable in pairs(currentMapData) do
+	local cf = CFrame.new(posTable[1], posTable[2], posTable[3])
+	savedWaypoints[name] = cf
+	addWaypointItem(name, cf)
+end
+
+-- ==========================================
+-- SYSTEM CONTROL MODAL OVERLAY (TELEPORT & ESP)
+-- ==========================================
+local currentModalMode = "TELEPORT"
+
+-- 1. BUKA MODAL DARI TELEPORT
+SetSaveBtn.MouseButton1Click:Connect(function()
+	currentModalMode = "TELEPORT"
+	ModalTitle.Text = "Nama Save Point"
+	ModalInput.Text = ""
+	ModalInput.PlaceholderText = "Masukkan nama..."
+	ModalOverlay.Visible = true
+end)
+
+-- 2. BUKA MODAL DARI ESP PART
+AddESPBtn.MouseButton1Click:Connect(function()
+	currentModalMode = "ESP"
+	ModalTitle.Text = "Add Part ESP"
+	ModalInput.Text = ""
+	ModalInput.PlaceholderText = "Path / Nama Part..."
+	ModalOverlay.Visible = true
+end)
+
+-- 3. EKSEKUSI TOMBOL SAVE (TERPUSAT)
+SaveModalBtn.MouseButton1Click:Connect(function()
+	local text = ModalInput.Text
+	if text == "" then return end
+
+	if currentModalMode == "TELEPORT" then
+		if not savedWaypoints[text] then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				local cf = LocalPlayer.Character.HumanoidRootPart.CFrame
+				savedWaypoints[text] = cf
+				addWaypointItem(text, cf)
+				saveWaypointsToFile()
+			end
+		end
+		ModalOverlay.Visible = false
+
+	elseif currentModalMode == "ESP" then
+		addESPPartItem(text)
+		ModalOverlay.Visible = false
+		
+		-- Reset otomatis ke mode Teleport
+		currentModalMode = "TELEPORT"
+		ModalTitle.Text = "Nama Save Point"
+		ModalInput.PlaceholderText = "Masukkan nama..."
+	end
+end)
+
+-- 4. CANCEL MODAL
+CancelModalBtn.MouseButton1Click:Connect(function()
+	ModalOverlay.Visible = false
+	currentModalMode = "TELEPORT"
+	ModalTitle.Text = "Nama Save Point"
+	ModalInput.PlaceholderText = "Masukkan nama..."
+end)
+
+-- CONTROLS UTAMA & SHORTCUT SYNC
+local function setShortcutsDraggable(state)
+	for _, scBtn in pairs(activeShortcuts) do
+		if scBtn then
+			scBtn.Active = state
+			scBtn.Draggable = state
+		end
+	end
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+	MainFrame.Visible = not MainFrame.Visible
+	setShortcutsDraggable(MainFrame.Visible)
+end)
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	setShortcutsDraggable(false)
+end)
+
+ShutdownBtn.MouseButton1Click:Connect(function()
+	for name, conn in pairs(connections) do
+		if conn then 
+			conn:Disconnect() 
+		end
+	end
+	connections = {}
+
+	isESPEnabled = false
+	removeESP()
+
+	isSpeedLoopEnabled = false
+	if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+		LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 16
+	end
+
+	Lighting.FogEnd = defaultLighting.FogEnd
+	Lighting.ClockTime = defaultLighting.ClockTime
+
+	for _, scBtn in pairs(activeShortcuts) do
+		if scBtn then scBtn:Destroy() end
+	end
+	activeShortcuts = {}
+	ScreenGui:Destroy()
+end)
